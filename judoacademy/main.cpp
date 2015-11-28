@@ -1,5 +1,7 @@
 #include "JudoAcademy.h"
-
+#include <iostream>
 int main() {
-	JudoAcademy judo;
+	JudoAcademyView judo;
+	judo.render(std::cout);
+	return 0;
 }
