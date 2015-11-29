@@ -3,7 +3,8 @@
 #include <iostream>
 #include <ostream>
 #include <functional>
-
+#include <vector>
+#include <algorithm>
 
 typedef std::function<void() > SelectionEventHandler;
 
@@ -12,9 +13,46 @@ public:
 	virtual void render(std::ostream&) const = 0 ;
 };
 
+class Component : public Renderable {
+public:
+	virtual void setName(const std::string& newName) = 0;
+	virtual const std::string& getName() const = 0;
+};
+
+class View : public Renderable {
+protected:
+	typedef std::vector<Component*>::const_iterator ComponentIterator;
+	typedef std::vector<Component*> ComponentCollection;
+	ComponentCollection components;
+public:
+	virtual ~View() {
+		std::for_each(components.begin(), components.end(), [](Component* c){
+			delete c;
+		});
+	}
+
+	virtual void update() = 0;
+	void addComponent(Component* newComponent) {
+		components.push_back(newComponent);
+	}
+
+	Component* getComponentByName(const std::string& componentName) const {
+		ComponentIterator found = std::find_if(components.begin(), components.end(), [&componentName](Component* c) {
+			return c->getName() == componentName;
+		});
+		if (found == components.end()) return nullptr;
+
+		return *found;
+	}
+
+	const ComponentCollection& getComponents() const {
+		return components;
+	}
+};
 
 
-class SelectableOption : public Renderable {
+
+class SelectableOption : public Component {
 private:
 	char id = '\0';
 	std::string name;
@@ -34,7 +72,7 @@ public:
 		id = newId;
 	}
 
-	inline void setName(const std::string& newName) {
+	inline void setName(const std::string& newName) override {
 		name = newName;
 	}
 
@@ -42,7 +80,7 @@ public:
 		description = newDesc;
 	}
 
-	inline const std::string& getName() const {
+	inline const std::string& getName() const override {
 		return name;
 	}
 
@@ -70,89 +108,83 @@ inline std::ostream& operator<<(std::ostream& os, const SelectableOption& obj) {
 	return os;
 }
 
-class JudoAcademyView : public Renderable
+class JudoAcademyView :  public View
 {
 private:
-	SelectableOption rentButton;
-	SelectableOption managementButton;
 	SelectableOption* buttons[2];
 public:
-	JudoAcademyView() 
-		: rentButton('r', "Rent", "Do you fancy renting judo movies?"),
-		managementButton('m', "Manage", "Do you fancy managing judo movies?") {
-		buttons[0] = &rentButton;
-		buttons[1] = &managementButton;
-	}
+	JudoAcademyView();
 
-	~JudoAcademyView() = default;
+	~JudoAcademyView();
 
-	virtual void render(std::ostream& out) const override {
-		system("CLS");
-		out << "Welcome to JudoAcademy management console!" << std::endl << std::endl;
-		out << rentButton << std::endl << managementButton << std::endl;
-	}
+	virtual void render(std::ostream& out) const override;
 
-	inline SelectableOption& getRentButton() {
-		return rentButton;
-	}
-
-	inline SelectableOption& getManagementButton() {
-		return managementButton;
-	}
-
-	void update() {
-		std::string line;
-		std::getline(std::cin, line);
-		if (line.empty()) return;
-
-		char id = line[0];
-		for (size_t i = 0; i < 2; ++i) {
-			SelectableOption* btn = buttons[i];
-			char btnId = btn->getId();
-			if (btnId == id) {
-				btn->onPressed();
-				return;
-			}
-		}
-	}
+	void update() override;
 };
 
-class JudoAcademyController {
+class JudoAcademyRentView : public View
+{
+public:
+	JudoAcademyRentView();
+
+	~JudoAcademyRentView();
+
+	virtual void render(std::ostream& out) const override;
+
+	void update() override;
+};
+
+class Controller {
+protected:
+	class JudoAcademy* app;
+	View* view;
+	Controller(View* view, class JudoAcademy* app);
+public:
+	virtual ~Controller() {}
+
+};
+
+class JudoAcademyController : public Controller {
 private:
-	JudoAcademyView& view;
-
-	void onRentButtonSelected() {
-		std::cout << "rent button pressed" << std::endl;
-	}
-
-	void onManagementButtonSelected() {
-		std::cout << "rent button pressed" << std::endl;
-	}
+	void onRentButtonSelected();
+	void onManagementButtonSelected();
 
 public:
-	JudoAcademyController(JudoAcademyView& view) 
-		: view(view) {
-		view.getRentButton().setSelectionHandler(std::bind(&JudoAcademyController::onRentButtonSelected, this));
-		view.getManagementButton().setSelectionHandler(std::bind(&JudoAcademyController::onManagementButtonSelected, this));
-	}
+	JudoAcademyController(View* newView, class JudoAcademy* app);
 	~JudoAcademyController() = default;
+};
+
+
+class JudoAcademyRentController : public Controller {
+public:
+	JudoAcademyRentController(View* view, class JudoAcademy* app);
 };
 
 class JudoAcademy
 {
 private:
-	JudoAcademyView view;
-	JudoAcademyController controller;
+	View* currentView;
+	Controller* currentController;
 public:
 	JudoAcademy()
-		: controller(view) {}
+		: currentView(new JudoAcademyView), currentController(new JudoAcademyController(currentView, this)) {}
 	~JudoAcademy() = default;
 
 	void run() {
 		while (1) {
-			view.render(std::cout);
-			view.update();
+			currentView->render(std::cout);
+			currentView->update();
 		}
+	}
+
+	void changeView(View* newView) {
+		delete currentView;
+		currentView = newView;
+	}
+
+	void changeController(Controller* newController) {
+		delete currentController;
+		currentController = newController;
 	}
 };
 
