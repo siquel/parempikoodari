@@ -2,13 +2,14 @@
 
 void JudoAcademyController::onRentButtonSelected() {
 	std::cout << "rent button pressed" << std::endl;
-	JudoAcademyRentView* newView = new JudoAcademyRentView();
-	app->pushView(newView);
-	app->pushController(new JudoAcademyRentController(newView, app));
+
 }
 
 void JudoAcademyController::onManagementButtonSelected() {
-	std::cout << "rent button pressed" << std::endl;
+	std::cout << "manage button pressed" << std::endl;
+	JudoAcademyManageView* newView = new JudoAcademyManageView();
+	app->pushView(newView);
+	app->pushController(new JudoAcademyManageController(newView, app));
 }
 
 
@@ -65,7 +66,7 @@ void JudoAcademyView::update() {
 	}
 }
 
-JudoAcademyRentView::JudoAcademyRentView() {
+JudoAcademyManageView::JudoAcademyManageView() {
 	addButton = new SelectableOption('a', "Add", "Add new movie to db");
 	removeButton = new SelectableOption('r', "Remove", "Remove movie from db");
 	modifyButton = new SelectableOption('m', "Modify", "Modify movie");
@@ -76,10 +77,10 @@ JudoAcademyRentView::JudoAcademyRentView() {
 	addComponent(backButton);
 }
 
-JudoAcademyRentView::~JudoAcademyRentView() {
+JudoAcademyManageView::~JudoAcademyManageView() {
 }
 
-void JudoAcademyRentView::render(std::ostream& out) const {
+void JudoAcademyManageView::render(std::ostream& out) const {
 	system("cls");
 	out << "How may i serve u today?" << std::endl << std::endl;
 
@@ -89,7 +90,7 @@ void JudoAcademyRentView::render(std::ostream& out) const {
 	}
 }
 
-void JudoAcademyRentView::update() {
+void JudoAcademyManageView::update() {
 	std::string line;
 	std::getline(std::cin, line);
 
@@ -106,12 +107,12 @@ void JudoAcademyRentView::update() {
 	}
 }
 
-void JudoAcademyRentController::onAddPressed() {
+void JudoAcademyManageController::onAddPressed() {
 	system("CLS");
 	std::cout << "Adding new movie..." << std::endl;
 
 	std::string name, description;
-	int year, format;
+	size_t year, format;
 	double price;
 
 	std::cout << "Name: ";
@@ -131,35 +132,42 @@ void JudoAcademyRentController::onAddPressed() {
 		std::cin >> format;
 	} while (format < DVD || format > VHS);
 
-	MovieModel movie(name, description, year, price, static_cast<Format>(format));
+	app->addMovie(MovieModel(name, description, year, price, static_cast<Format>(format)));
 }
 
-void JudoAcademyRentController::onRemovePressed() {
-
-}
-
-void JudoAcademyRentController::onModifyPressed() {
+void JudoAcademyManageController::onRemovePressed() {
 
 }
 
-void JudoAcademyRentController::onBackPressed() {
+void JudoAcademyManageController::onModifyPressed() {
+	std::cout << "Select movie id which to modify: " << std::endl << std::endl;
+	std::vector<MovieModel>& movies = app->getMovies();
+
+	for (size_t i = 0; i < movies.size(); ++i) {
+		std::cout << i << "). --- " << movies[i].getName() << std::endl;
+	}
+	size_t index = 0;
+	std::cin >> index;
+}
+
+void JudoAcademyManageController::onBackPressed() {
 	app->popView();
 	app->popController();
 }
 
-JudoAcademyRentController::JudoAcademyRentController(View* view, class JudoAcademy* app)
+JudoAcademyManageController::JudoAcademyManageController(View* view, class JudoAcademy* app)
 	: Controller(view, app) {
 	SelectableOption* add = static_cast<SelectableOption*>(view->getComponentByName("Add"));
 	SelectableOption* remove = static_cast<SelectableOption*>(view->getComponentByName("Remove"));
 	SelectableOption* modify = static_cast<SelectableOption*>(view->getComponentByName("Modify"));
 	SelectableOption* back = static_cast<SelectableOption*>(view->getComponentByName("Back"));
-	add->setSelectionHandler(std::bind(&JudoAcademyRentController::onAddPressed, this));
-	remove->setSelectionHandler(std::bind(&JudoAcademyRentController::onRemovePressed, this));
-	modify->setSelectionHandler(std::bind(&JudoAcademyRentController::onRemovePressed, this));
-	back->setSelectionHandler(std::bind(&JudoAcademyRentController::onBackPressed, this));
+	add->setSelectionHandler(std::bind(&JudoAcademyManageController::onAddPressed, this));
+	remove->setSelectionHandler(std::bind(&JudoAcademyManageController::onRemovePressed, this));
+	modify->setSelectionHandler(std::bind(&JudoAcademyManageController::onModifyPressed, this));
+	back->setSelectionHandler(std::bind(&JudoAcademyManageController::onBackPressed, this));
 }
 
-MovieModel::MovieModel(const std::string& name, const std::string& description, const int year, const double price, Format fmt)
+MovieModel::MovieModel(const std::string& name, const std::string& description, const size_t year, const double price, Format fmt)
 	: name(name), description(description), year(year), price(price), format(fmt) {
 
 }

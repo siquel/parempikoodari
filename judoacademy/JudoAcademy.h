@@ -18,13 +18,28 @@ class MovieModel {
 private:
 	std::string name;
 	std::string description;
-	int year;
+	size_t year;
 	double price;
 	Format format;
 public:
-	MovieModel(const std::string& name, const std::string& description, const int year, const double price, Format fmt);
+	MovieModel(const std::string& name, const std::string& description, const size_t year, const double price, Format fmt);
 	~MovieModel() = default;
 
+	inline const Format getFormat() const {
+		return format;
+	}
+
+	inline const std::string& getName() const {
+		return name;
+	}
+
+	inline const std::string& getDescription() const {
+		return description;
+	}
+
+	inline const size_t getYear() const {
+		return year;
+	}
 };
 
 class Renderable {
@@ -141,7 +156,7 @@ public:
 	void update() override;
 };
 
-class JudoAcademyRentView : public View
+class JudoAcademyManageView : public View
 {
 private:
 	SelectableOption* addButton;
@@ -149,9 +164,9 @@ private:
 	SelectableOption* modifyButton;
 	SelectableOption* backButton;
 public:
-	JudoAcademyRentView();
+	JudoAcademyManageView();
 
-	~JudoAcademyRentView();
+	~JudoAcademyManageView();
 
 	virtual void render(std::ostream& out) const override;
 
@@ -179,21 +194,29 @@ public:
 };
 
 
-class JudoAcademyRentController : public Controller {
+class JudoAcademyManageController : public Controller {
 private:
 	void onAddPressed();
 	void onRemovePressed();
 	void onModifyPressed();
 	void onBackPressed();
 public:
-	JudoAcademyRentController(View* view, class JudoAcademy* app);
+	JudoAcademyManageController(View* view, class JudoAcademy* app);
 };
 
 class JudoAcademy
 {
 private:
+	typedef std::vector<MovieModel> MovieCollection;
 	std::vector<View*> views;
 	std::vector<Controller*> controllers;
+	MovieCollection database;
+
+	inline void getMoviesByPredicate(std::function<bool(MovieModel&)> predicate, std::vector<MovieModel>& out) {
+		std::for_each(database.begin(), database.end(), [&out, predicate](MovieModel& model){
+			if (predicate(model)) out.push_back(model);
+		});	
+	}
 public:
 	JudoAcademy() {
 		View* view = new JudoAcademyView;
@@ -208,6 +231,28 @@ public:
 			views.back()->render(std::cout);
 			views.back()->update();
 		}
+	}
+
+	inline MovieCollection& getMovies() {
+		return database;
+	}
+
+	inline void addMovie(const MovieModel& movie) {
+		database.push_back(movie);
+	}
+
+	inline MovieModel* getMovieByName(const std::string& name) {
+		return nullptr;
+	}
+
+	inline MovieModel* getMovieByIndex(const size_t index) {
+		return &database[index];
+	}
+
+	inline void getMoviesByFormat(const Format format, MovieCollection& to) {
+		getMoviesByPredicate([format](MovieModel& model){
+			return model.getFormat() == format;
+		}, to);
 	}
 
 	void pushView(View* view) {
