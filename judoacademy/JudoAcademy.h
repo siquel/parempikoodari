@@ -5,6 +5,7 @@
 #include <functional>
 #include <vector>
 #include <algorithm>
+#include <queue>
 
 typedef std::function<void() > SelectionEventHandler;
 
@@ -219,6 +220,11 @@ public:
 	JudoAcademyManageController(View* view, class JudoAcademy* app);
 };
 
+class JudoAcademyMovieEditController : public Controller {
+public:
+	JudoAcademyMovieEditController(View* view, class JudoAcademy* app);
+};
+
 class JudoAcademy
 {
 private:
@@ -226,6 +232,9 @@ private:
 	std::vector<View*> views;
 	std::vector<Controller*> controllers;
 	MovieCollection database;
+
+	std::queue<std::string> errors;
+
 	bool running;
 	inline void getMoviesByPredicate(std::function<bool(MovieModel&)> predicate, std::vector<MovieModel>& out) {
 		std::for_each(database.begin(), database.end(), [&out, predicate](MovieModel& model){
@@ -245,10 +254,19 @@ public:
 		running = false;
 	}
 
+	void raiseError(const std::string& errorString) {
+		errors.push(errorString);
+	}
+
 	void run() {
 		running = true;
 		while (running) {
 			views.back()->render(std::cout);
+			// usually render clears the console, so flash errors after render
+			while (errors.size()) {
+				std::cerr << "\t" << errors.front() << std::endl;
+				errors.pop();
+			}
 			views.back()->update();
 		}
 	}

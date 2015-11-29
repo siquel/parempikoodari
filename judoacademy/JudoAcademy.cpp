@@ -114,17 +114,32 @@ void JudoAcademyManageController::onRemovePressed() {
 }
 
 void JudoAcademyManageController::onModifyPressed() {
-	std::cout << "Select movie id which to modify: " << std::endl << std::endl;
+	size_t index = 0;
 	std::vector<MovieModel>& movies = app->getMovies();
 
-	for (size_t i = 0; i < movies.size(); ++i) {
-		std::cout << i << "). --- " << movies[i].getName() << std::endl;
+	// if we dont have movies, just go back
+	if (movies.empty()) {
+		app->raiseError("No movies!");
+		return;
 	}
-	size_t index = 0;
-	std::cin >> index;
+
+	do {
+		std::cout << "Select movie id which to modify: " << std::endl << std::endl;
+		
+
+		for (size_t i = 0; i < movies.size(); ++i) {
+			std::cout << i << "). --- " << movies[i].getName() << std::endl;
+		}
+
+		std::cin >> index;
+	} while (index > movies.size());
 
 	MovieModel& model = movies[index];
-	// TODO push edit view
+	
+	JudoAcademyMovieEditView* view = new JudoAcademyMovieEditView(&model);
+	JudoAcademyMovieEditController* controller = new JudoAcademyMovieEditController(view, app);
+	app->pushView(view);
+	app->pushController(controller);
 }
 
 void JudoAcademyManageController::onBackPressed() {
@@ -189,4 +204,9 @@ void BasicView::render(std::ostream& out) const {
 		components[i]->render(out);
 		out << std::endl;
 	}
+}
+
+JudoAcademyMovieEditController::JudoAcademyMovieEditController(View* view, JudoAcademy* app)
+	: Controller(view, app) {
+
 }
