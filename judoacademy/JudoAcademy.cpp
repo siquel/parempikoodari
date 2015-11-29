@@ -1,5 +1,11 @@
 #include "JudoAcademy.h"
 
+#define JUDO_CALLBACK_0(__selector__, __target__,...)   std::bind(&__selector__,__target__, ##__VA_ARGS__)
+
+#define BIND_FUNC_TO_COMPONENT(view, name, selector, target) \
+(static_cast<SelectableOption*>(view->getComponentByName(name)))->setSelectionHandler(\
+	JUDO_CALLBACK_0(selector, target))
+
 void JudoAcademyController::onRentButtonSelected() {
 	std::cout << "rent button pressed" << std::endl;
 
@@ -24,12 +30,9 @@ Controller::Controller(View* view, JudoAcademy* app)
 
 JudoAcademyController::JudoAcademyController(View* newView, JudoAcademy* app)
 	: Controller(newView, app) {
-	SelectableOption* rentButton = static_cast<SelectableOption*>(view->getComponentByName("Rent"));
-	SelectableOption* manageButton = static_cast<SelectableOption*>(view->getComponentByName("Manage"));
-	SelectableOption* exitButton = static_cast<SelectableOption*>(view->getComponentByName("Exit"));
-	rentButton->setSelectionHandler(std::bind(&JudoAcademyController::onRentButtonSelected, this));
-	manageButton->setSelectionHandler(std::bind(&JudoAcademyController::onManagementButtonSelected, this));
-	exitButton->setSelectionHandler(std::bind(&JudoAcademyController::onExitButtonSelected, this));
+	BIND_FUNC_TO_COMPONENT(view, "Rent", JudoAcademyController::onRentButtonSelected, this);
+	BIND_FUNC_TO_COMPONENT(view, "Manage", JudoAcademyController::onManagementButtonSelected, this);
+	BIND_FUNC_TO_COMPONENT(view, "Exit", JudoAcademyController::onExitButtonSelected, this);
 }
 
 
@@ -124,6 +127,7 @@ void JudoAcademyManageController::onModifyPressed() {
 	}
 
 	do {
+		system("cls");
 		std::cout << "Select movie id which to modify: " << std::endl << std::endl;
 		
 
@@ -149,14 +153,10 @@ void JudoAcademyManageController::onBackPressed() {
 
 JudoAcademyManageController::JudoAcademyManageController(View* view, class JudoAcademy* app)
 	: Controller(view, app) {
-	SelectableOption* add = static_cast<SelectableOption*>(view->getComponentByName("Add"));
-	SelectableOption* remove = static_cast<SelectableOption*>(view->getComponentByName("Remove"));
-	SelectableOption* modify = static_cast<SelectableOption*>(view->getComponentByName("Modify"));
-	SelectableOption* back = static_cast<SelectableOption*>(view->getComponentByName("Back"));
-	add->setSelectionHandler(std::bind(&JudoAcademyManageController::onAddPressed, this));
-	remove->setSelectionHandler(std::bind(&JudoAcademyManageController::onRemovePressed, this));
-	modify->setSelectionHandler(std::bind(&JudoAcademyManageController::onModifyPressed, this));
-	back->setSelectionHandler(std::bind(&JudoAcademyManageController::onBackPressed, this));
+	BIND_FUNC_TO_COMPONENT(view, "Add", JudoAcademyManageController::onAddPressed, this);
+	BIND_FUNC_TO_COMPONENT(view, "Remove", JudoAcademyManageController::onRemovePressed, this);
+	BIND_FUNC_TO_COMPONENT(view, "Modify", JudoAcademyManageController::onModifyPressed, this);
+	BIND_FUNC_TO_COMPONENT(view, "Back", JudoAcademyManageController::onBackPressed, this);
 }
 
 MovieModel::MovieModel(const std::string& name, const std::string& description, const size_t year, const double price, Format fmt)
@@ -166,7 +166,8 @@ MovieModel::MovieModel(const std::string& name, const std::string& description, 
 
 JudoAcademyMovieEditView::JudoAcademyMovieEditView(MovieModel* model) 
 	:model(model) {
-
+	SelectableOption* back = new SelectableOption('b', "Back", "Go back");
+	addComponent(back);
 }
 
 JudoAcademyMovieEditView::~JudoAcademyMovieEditView() {
@@ -206,7 +207,12 @@ void BasicView::render(std::ostream& out) const {
 	}
 }
 
+void JudoAcademyMovieEditController::onBackPressed() {
+	app->popView();
+	app->popController();
+}
+
 JudoAcademyMovieEditController::JudoAcademyMovieEditController(View* view, JudoAcademy* app)
 	: Controller(view, app) {
-
+	BIND_FUNC_TO_COMPONENT(view, "Back", JudoAcademyMovieEditController::onBackPressed, this);
 }

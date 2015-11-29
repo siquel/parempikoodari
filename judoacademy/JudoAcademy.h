@@ -221,6 +221,8 @@ public:
 };
 
 class JudoAcademyMovieEditController : public Controller {
+private:
+	void onBackPressed();
 public:
 	JudoAcademyMovieEditController(View* view, class JudoAcademy* app);
 };
