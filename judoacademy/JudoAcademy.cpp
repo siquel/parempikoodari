@@ -49,26 +49,11 @@ JudoAcademyView::~JudoAcademyView() {
 void JudoAcademyView::render(std::ostream& out) const {
 	system("CLS");
 	out << "Welcome to JudoAcademy management console!" << std::endl << std::endl;
-	for (size_t i = 0; i < components.size(); ++i){
-		components[i]->render(out);
-		out << std::endl;
-	}
+	BasicView::render(out);
 }
 
 void JudoAcademyView::update() {
-	std::string line;
-	std::getline(std::cin, line);
-	if (line.empty()) return;
-
-	char id = line[0];
-	for (size_t i = 0; i < components.size(); ++i) {
-		SelectableOption* btn = static_cast<SelectableOption*>(components[i]);
-		char btnId = btn->getId();
-		if (btnId == id) {
-			btn->onPressed();
-			return;
-		}
-	}
+	BasicView::update();
 }
 
 JudoAcademyManageView::JudoAcademyManageView() {
@@ -89,27 +74,11 @@ void JudoAcademyManageView::render(std::ostream& out) const {
 	system("cls");
 	out << "How may i serve u today?" << std::endl << std::endl;
 
-	for (size_t i = 0; i < components.size(); ++i){
-		components[i]->render(out);
-		out << std::endl;
-	}
+	BasicView::render(out);
 }
 
 void JudoAcademyManageView::update() {
-	std::string line;
-	std::getline(std::cin, line);
-
-	if (line.empty()) return;
-
-	char id = line[0];
-	for (size_t i = 0; i < components.size(); ++i) {
-		SelectableOption* btn = static_cast<SelectableOption*>(components[i]);
-		char btnId = btn->getId();
-		if (btnId == id) {
-			btn->onPressed();
-			return;
-		}
-	}
+	BasicView::update();
 }
 
 void JudoAcademyManageController::onAddPressed() {
@@ -153,6 +122,9 @@ void JudoAcademyManageController::onModifyPressed() {
 	}
 	size_t index = 0;
 	std::cin >> index;
+
+	MovieModel& model = movies[index];
+	// TODO push edit view
 }
 
 void JudoAcademyManageController::onBackPressed() {
@@ -175,4 +147,46 @@ JudoAcademyManageController::JudoAcademyManageController(View* view, class JudoA
 MovieModel::MovieModel(const std::string& name, const std::string& description, const size_t year, const double price, Format fmt)
 	: name(name), description(description), year(year), price(price), format(fmt) {
 
+}
+
+JudoAcademyMovieEditView::JudoAcademyMovieEditView(MovieModel* model) 
+	:model(model) {
+
+}
+
+JudoAcademyMovieEditView::~JudoAcademyMovieEditView() {
+
+}
+
+void JudoAcademyMovieEditView::render(std::ostream& out) const {
+	system("cls");
+	std::cout << "Editing " << model->getName() << std::endl;
+	BasicView::render(out);
+}
+
+void JudoAcademyMovieEditView::update() {
+	BasicView::update();
+}
+
+void BasicView::update() {
+	std::string line;
+	std::getline(std::cin, line);
+	if (line.empty()) return;
+
+	char id = line[0];
+	for (size_t i = 0; i < components.size(); ++i) {
+		SelectableOption* btn = static_cast<SelectableOption*>(components[i]);
+		char btnId = btn->getId();
+		if (btnId == id) {
+			btn->onPressed();
+			return;
+		}
+	}
+}
+
+void BasicView::render(std::ostream& out) const {
+	for (size_t i = 0; i < components.size(); ++i){
+		components[i]->render(out);
+		out << std::endl;
+	}
 }

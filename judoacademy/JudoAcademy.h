@@ -84,6 +84,11 @@ public:
 	}
 };
 
+class BasicView : public View {
+public:
+	virtual void update();
+	virtual void render(std::ostream&) const;
+};
 
 
 class SelectableOption : public Component {
@@ -142,7 +147,7 @@ inline std::ostream& operator<<(std::ostream& os, const SelectableOption& obj) {
 	return os;
 }
 
-class JudoAcademyView :  public View
+class JudoAcademyView :  public BasicView
 {
 private:
 public:
@@ -155,7 +160,18 @@ public:
 	void update() override;
 };
 
-class JudoAcademyManageView : public View
+class JudoAcademyMovieEditView : public BasicView {
+private:
+	MovieModel* model;
+public:
+	JudoAcademyMovieEditView(MovieModel* model);
+	~JudoAcademyMovieEditView();
+	virtual void render(std::ostream& out) const override;
+
+	void update() override;
+};
+
+class JudoAcademyManageView : public BasicView
 {
 private:
 	SelectableOption* addButton;
