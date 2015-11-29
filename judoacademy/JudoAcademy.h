@@ -145,7 +145,6 @@ inline std::ostream& operator<<(std::ostream& os, const SelectableOption& obj) {
 class JudoAcademyView :  public View
 {
 private:
-	SelectableOption* buttons[2];
 public:
 	JudoAcademyView();
 
@@ -187,7 +186,7 @@ class JudoAcademyController : public Controller {
 private:
 	void onRentButtonSelected();
 	void onManagementButtonSelected();
-
+	void onExitButtonSelected();
 public:
 	JudoAcademyController(View* newView, class JudoAcademy* app);
 	~JudoAcademyController() = default;
@@ -211,14 +210,14 @@ private:
 	std::vector<View*> views;
 	std::vector<Controller*> controllers;
 	MovieCollection database;
-
+	bool running;
 	inline void getMoviesByPredicate(std::function<bool(MovieModel&)> predicate, std::vector<MovieModel>& out) {
 		std::for_each(database.begin(), database.end(), [&out, predicate](MovieModel& model){
 			if (predicate(model)) out.push_back(model);
 		});	
 	}
 public:
-	JudoAcademy() {
+	JudoAcademy() : running(false) {
 		View* view = new JudoAcademyView;
 		Controller* controller = new JudoAcademyController(view, this);
 		views.push_back(view);
@@ -226,8 +225,13 @@ public:
 	}
 	~JudoAcademy() = default;
 
+	void stop() {
+		running = false;
+	}
+
 	void run() {
-		while (1) {
+		running = true;
+		while (running) {
 			views.back()->render(std::cout);
 			views.back()->update();
 		}

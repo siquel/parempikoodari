@@ -13,6 +13,10 @@ void JudoAcademyController::onManagementButtonSelected() {
 }
 
 
+void JudoAcademyController::onExitButtonSelected() {
+	app->stop();
+}
+
 Controller::Controller(View* view, JudoAcademy* app)
 	:view(view), app(app) {
 
@@ -22,19 +26,20 @@ JudoAcademyController::JudoAcademyController(View* newView, JudoAcademy* app)
 	: Controller(newView, app) {
 	SelectableOption* rentButton = static_cast<SelectableOption*>(view->getComponentByName("Rent"));
 	SelectableOption* manageButton = static_cast<SelectableOption*>(view->getComponentByName("Manage"));
+	SelectableOption* exitButton = static_cast<SelectableOption*>(view->getComponentByName("Exit"));
 	rentButton->setSelectionHandler(std::bind(&JudoAcademyController::onRentButtonSelected, this));
 	manageButton->setSelectionHandler(std::bind(&JudoAcademyController::onManagementButtonSelected, this));
+	exitButton->setSelectionHandler(std::bind(&JudoAcademyController::onExitButtonSelected, this));
 }
 
 
 JudoAcademyView::JudoAcademyView()  {
 	SelectableOption* rent = new SelectableOption('r', "Rent", "Do you fancy renting judo movies?");
 	SelectableOption* manage = new SelectableOption('m', "Manage", "Do you fancy managing judo movies?");
+	SelectableOption* exit = new SelectableOption('x', "Exit", "Exit app");
 	addComponent(rent);
 	addComponent(manage);
-	buttons[0] = rent;
-	buttons[1] = manage;
-
+	addComponent(exit);
 }
 
 JudoAcademyView::~JudoAcademyView() {
@@ -56,8 +61,8 @@ void JudoAcademyView::update() {
 	if (line.empty()) return;
 
 	char id = line[0];
-	for (size_t i = 0; i < 2; ++i) {
-		SelectableOption* btn = buttons[i];
+	for (size_t i = 0; i < components.size(); ++i) {
+		SelectableOption* btn = static_cast<SelectableOption*>(components[i]);
 		char btnId = btn->getId();
 		if (btnId == id) {
 			btn->onPressed();
