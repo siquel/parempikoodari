@@ -124,6 +124,11 @@ public:
 
 class JudoAcademyRentView : public View
 {
+private:
+	SelectableOption* addButton;
+	SelectableOption* removeButton;
+	SelectableOption* modifyButton;
+	SelectableOption* backButton;
 public:
 	JudoAcademyRentView();
 
@@ -156,6 +161,11 @@ public:
 
 
 class JudoAcademyRentController : public Controller {
+private:
+	void onAddPressed();
+	void onRemovePressed();
+	void onModifyPressed();
+	void onBackPressed();
 public:
 	JudoAcademyRentController(View* view, class JudoAcademy* app);
 };
@@ -163,28 +173,41 @@ public:
 class JudoAcademy
 {
 private:
-	View* currentView;
-	Controller* currentController;
+	std::vector<View*> views;
+	std::vector<Controller*> controllers;
 public:
-	JudoAcademy()
-		: currentView(new JudoAcademyView), currentController(new JudoAcademyController(currentView, this)) {}
+	JudoAcademy() {
+		View* view = new JudoAcademyView;
+		Controller* controller = new JudoAcademyController(view, this);
+		views.push_back(view);
+		controllers.push_back(controller);
+	}
 	~JudoAcademy() = default;
 
 	void run() {
 		while (1) {
-			currentView->render(std::cout);
-			currentView->update();
+			views.back()->render(std::cout);
+			views.back()->update();
 		}
 	}
 
-	void changeView(View* newView) {
-		delete currentView;
-		currentView = newView;
+	void pushView(View* view) {
+		views.push_back(view);
 	}
 
-	void changeController(Controller* newController) {
-		delete currentController;
-		currentController = newController;
+	void popView() {
+		delete views.back();
+		views.pop_back();
 	}
+
+	void popController() {
+		delete controllers.back();
+		controllers.pop_back();
+	}
+
+	void pushController(Controller* newController) {
+		controllers.push_back(newController);
+	}
+
 };
 
