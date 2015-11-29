@@ -8,6 +8,25 @@
 
 typedef std::function<void() > SelectionEventHandler;
 
+enum Format {
+	DVD,
+	Bluray,
+	VHS
+};
+
+class MovieModel {
+private:
+	std::string name;
+	std::string description;
+	int year;
+	double price;
+	Format format;
+public:
+	MovieModel(const std::string& name, const std::string& description, const int year, const double price, Format fmt);
+	~MovieModel() = default;
+
+};
+
 class Renderable {
 public:
 	virtual void render(std::ostream&) const = 0 ;

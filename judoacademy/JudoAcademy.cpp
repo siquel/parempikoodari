@@ -107,7 +107,31 @@ void JudoAcademyRentView::update() {
 }
 
 void JudoAcademyRentController::onAddPressed() {
+	system("CLS");
+	std::cout << "Adding new movie..." << std::endl;
 
+	std::string name, description;
+	int year, format;
+	double price;
+
+	std::cout << "Name: ";
+	std::getline(std::cin, name);
+	std::cout << std::endl;
+	std::cout << "Description:";
+	std::getline(std::cin, description);
+	std::cout << std::endl << "Year: ";
+	std::cin >> year;
+	std::cout << std::endl << "Price: ";
+	std::cin >> price;
+	
+	
+	do {
+		std::cout << "Is this DVD (" << Format::DVD << "), " << "Bluray (" << Bluray
+			<< ") or " << "VHS (" << VHS << "): ";
+		std::cin >> format;
+	} while (format < DVD || format > VHS);
+
+	MovieModel movie(name, description, year, price, static_cast<Format>(format));
 }
 
 void JudoAcademyRentController::onRemovePressed() {
@@ -133,4 +157,9 @@ JudoAcademyRentController::JudoAcademyRentController(View* view, class JudoAcade
 	remove->setSelectionHandler(std::bind(&JudoAcademyRentController::onRemovePressed, this));
 	modify->setSelectionHandler(std::bind(&JudoAcademyRentController::onRemovePressed, this));
 	back->setSelectionHandler(std::bind(&JudoAcademyRentController::onBackPressed, this));
+}
+
+MovieModel::MovieModel(const std::string& name, const std::string& description, const int year, const double price, Format fmt)
+	: name(name), description(description), year(year), price(price), format(fmt) {
+
 }
