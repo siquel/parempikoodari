@@ -141,7 +141,7 @@ void JudoAcademyManageController::onModifyPressed() {
 	MovieModel& model = movies[index];
 	
 	JudoAcademyMovieEditView* view = new JudoAcademyMovieEditView(&model);
-	JudoAcademyMovieEditController* controller = new JudoAcademyMovieEditController(view, app);
+	JudoAcademyMovieEditController* controller = new JudoAcademyMovieEditController(view, app, &model);
 	app->pushView(view);
 	app->pushController(controller);
 }
@@ -166,7 +166,15 @@ MovieModel::MovieModel(const std::string& name, const std::string& description, 
 
 JudoAcademyMovieEditView::JudoAcademyMovieEditView(MovieModel* model) 
 	:model(model) {
+	SelectableOption* name = new SelectableOption('n', "Edit name", "Edit movie name");
+	SelectableOption* desc = new SelectableOption('d', "Edit description", "Edit movie description");
+	SelectableOption* year = new SelectableOption('y', "Edit year", "Edit movie year");
+	SelectableOption* price = new SelectableOption('p', "Edit price", "Edit movie price");
 	SelectableOption* back = new SelectableOption('b', "Back", "Go back");
+	addComponent(name);
+	addComponent(desc);
+	addComponent(year);
+	addComponent(price);
 	addComponent(back);
 }
 
@@ -212,7 +220,31 @@ void JudoAcademyMovieEditController::onBackPressed() {
 	app->popController();
 }
 
-JudoAcademyMovieEditController::JudoAcademyMovieEditController(View* view, JudoAcademy* app)
-	: Controller(view, app) {
+void JudoAcademyMovieEditController::onEditNamePressed() {
+	system("CLS");
+	std::cout << "Current name: " << model->getName() << ". Enter new name: ";
+	std::string newName;
+	std::getline(std::cin, newName);
+	model->setName(newName);
+}
+
+void JudoAcademyMovieEditController::onEditYearPressed() {
+
+}
+
+void JudoAcademyMovieEditController::onEditPricePressed() {
+
+}
+
+void JudoAcademyMovieEditController::onEditDescriptionPressed() {
+
+}
+
+JudoAcademyMovieEditController::JudoAcademyMovieEditController(View* view, JudoAcademy* app, MovieModel* model)
+	: Controller(view, app), model(model) {
+	BIND_FUNC_TO_COMPONENT(view, "Edit name", JudoAcademyMovieEditController::onEditNamePressed, this);
+	BIND_FUNC_TO_COMPONENT(view, "Edit year", JudoAcademyMovieEditController::onEditYearPressed, this);
+	BIND_FUNC_TO_COMPONENT(view, "Edit price", JudoAcademyMovieEditController::onEditPricePressed, this);
+	BIND_FUNC_TO_COMPONENT(view, "Edit description", JudoAcademyMovieEditController::onEditDescriptionPressed, this);
 	BIND_FUNC_TO_COMPONENT(view, "Back", JudoAcademyMovieEditController::onBackPressed, this);
 }

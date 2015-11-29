@@ -26,6 +26,10 @@ public:
 	MovieModel(const std::string& name, const std::string& description, const size_t year, const double price, Format fmt);
 	~MovieModel() = default;
 
+	inline void setName(const std::string& newName) {
+		name = newName;
+	}
+
 	inline const Format getFormat() const {
 		return format;
 	}
@@ -222,9 +226,14 @@ public:
 
 class JudoAcademyMovieEditController : public Controller {
 private:
+	MovieModel* model;
 	void onBackPressed();
+	void onEditNamePressed();
+	void onEditYearPressed();
+	void onEditPricePressed();
+	void onEditDescriptionPressed();
 public:
-	JudoAcademyMovieEditController(View* view, class JudoAcademy* app);
+	JudoAcademyMovieEditController(View* view, class JudoAcademy* app, MovieModel* model);
 };
 
 class JudoAcademy
