@@ -70,10 +70,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="app.cpp" />
+    <ClCompile Include="controller.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="view.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="app.h" />
     <ClInclude Include="configuration.h" />
+    <ClInclude Include="controller.h" />
+    <ClInclude Include="forward_declare.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="view.h" />
   </ItemGroup>
