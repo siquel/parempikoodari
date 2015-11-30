@@ -307,16 +307,25 @@ void JudoAcademyRentController::onHirePressed() {
 		app->raiseError("No movies to hire!");
 		return;
 	}
+
+	Storage& storage = app->getStorage();
 	
 	do {
-		std::for_each(movies.begin(), movies.end(), [&i](MovieModel& model) {
-			std::cout << i++ << "). " << model << std::endl;
+		std::for_each(movies.begin(), movies.end(), [&i, &storage](MovieModel& model) {
+			size_t inStorage = storage.currentlyInStock(model);
+			std::cout << i++ << "). " << model << " | ";
+			if (inStorage) {
+				std::cout << "Available " << inStorage << " copies";
+			}
+			else {
+				std::cout << "Not available";
+			}
+			std::cout << std::endl;
 		});
 		std::cout << "Select movie you want to hire: ";
 		std::cin >> index;
 	} while (index > movies.size());
 
-	Storage& storage = app->getStorage();
 	MovieModel& model = movies[index];
 	
 	if (!storage.isAvailable(model)) {
