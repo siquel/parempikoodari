@@ -30,6 +30,18 @@ public:
 		name = newName;
 	}
 
+	inline void setYear(const size_t newYear) {
+		year = newYear;
+	}
+
+	inline void setDescription(const std::string& newDesc) {
+		description = newDesc;
+	}
+
+	inline void setPrice(const double newPrice) {
+		price = newPrice;
+	}
+
 	inline const Format getFormat() const {
 		return format;
 	}
@@ -44,6 +56,10 @@ public:
 
 	inline const size_t getYear() const {
 		return year;
+	}
+
+	inline const double getPrice() const {
+		return price;
 	}
 };
 

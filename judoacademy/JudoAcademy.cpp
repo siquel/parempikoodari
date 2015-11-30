@@ -220,24 +220,40 @@ void JudoAcademyMovieEditController::onBackPressed() {
 	app->popController();
 }
 
+template <class T>
+T getInput(const char* displayName, const T& currentValue) {
+	std::cout << "Current " << displayName << ": " << currentValue << ". Enter new " << displayName << ": ";
+	T newValue;
+	std::cin >> newValue;
+	return newValue;
+}
+
+template <>
+std::string getInput(const char* displayName, const std::string& currentValue) {
+	std::cout << "Current " << displayName << ": " << currentValue << ". Enter new " << displayName << ": ";
+	std::string newValue;
+	std::getline(std::cin, newValue);
+	return newValue;
+}
+
 void JudoAcademyMovieEditController::onEditNamePressed() {
 	system("CLS");
-	std::cout << "Current name: " << model->getName() << ". Enter new name: ";
-	std::string newName;
-	std::getline(std::cin, newName);
-	model->setName(newName);
+	model->setName(getInput<std::string>("name", model->getName()));
 }
 
 void JudoAcademyMovieEditController::onEditYearPressed() {
-
+	system("CLS");
+	model->setYear(getInput("year", model->getYear()));
 }
 
 void JudoAcademyMovieEditController::onEditPricePressed() {
-
+	system("CLS");
+	model->setPrice(getInput("price", model->getPrice()));
 }
 
 void JudoAcademyMovieEditController::onEditDescriptionPressed() {
-
+	system("CLS");
+	model->setDescription(getInput("description", model->getDescription()));
 }
 
 JudoAcademyMovieEditController::JudoAcademyMovieEditController(View* view, JudoAcademy* app, MovieModel* model)
