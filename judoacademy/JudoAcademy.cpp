@@ -295,7 +295,7 @@ void JudoAcademyRentController::onBackPressed() {
 
 void JudoAcademyRentController::onHirePressed() {
 	system("CLS");
-	size_t i = 0;
+	size_t i = 0, index = 0;
 	std::string line;
 	std::vector<MovieModel>& movies = app->getMovies();
 
@@ -304,11 +304,15 @@ void JudoAcademyRentController::onHirePressed() {
 		return;
 	}
 	
-	std::for_each(movies.begin(), movies.end(), [&i](MovieModel& model) {
-		std::cout << i++ << "). " << model << std::endl;
-	});
-	std::cout << "Select movie you want to hire: ";
-	std::getline(std::cin, line);
+	do {
+		std::for_each(movies.begin(), movies.end(), [&i](MovieModel& model) {
+			std::cout << i++ << "). " << model << std::endl;
+		});
+		std::cout << "Select movie you want to hire: ";
+		std::cin >> index;
+	} while (index > movies.size());
+
+	MovieModel& model = movies[index];
 }
 
 void JudoAcademyRentController::onReturnPressed() {
@@ -320,4 +324,56 @@ JudoAcademyRentController::JudoAcademyRentController(View* view, JudoAcademy* ap
 	BIND_FUNC_TO_COMPONENT(view, "Hire", JudoAcademyRentController::onHirePressed, this);
 	BIND_FUNC_TO_COMPONENT(view, "Return", JudoAcademyRentController::onReturnPressed, this);
 	BIND_FUNC_TO_COMPONENT(view, "Back", JudoAcademyRentController::onBackPressed, this);
+}
+
+size_t Storage::getIndexOf(const MovieModel& model) const {
+	auto it = std::find_if(database.begin(), database.end(), [&model](MovieModel& m) {
+		return m == model;
+	});
+	// it should always be in database
+	return std::distance(database.begin(), it);
+}
+
+void Storage::get(size_t index, size_t& currentlyInStock, size_t& total) const {
+	auto& record = stock[index];
+	currentlyInStock = std::get<0>(record);
+	total = std::get<1>(record);
+}
+
+Storage::Storage(MovieCollection& database)
+	: database(database) {
+
+}
+
+size_t Storage::currentlyInStock(const MovieModel& movieInStock) const {
+	size_t index = getIndexOf(movieInStock);
+	return std::get<0>(stock[index]);
+}
+
+size_t Storage::getTotalCopies(const MovieModel& ofMovie) const {
+	size_t index = getIndexOf(ofMovie);
+	return std::get<1>(stock[index]);
+}
+
+bool Storage::isAvailable(const MovieModel& movie) const {
+	return currentlyInStock(movie) != 0;
+}
+
+void Storage::rent(const MovieModel& movie) {
+	size_t index = getIndexOf(movie);
+	auto& record = stock[index];
+	std::get<0>(record)--;
+}
+
+size_t Storage::howManyCurrentlyRented(const MovieModel& movieToCheck) const {
+	size_t index = getIndexOf(movieToCheck);
+	size_t rented = 0, total = 0;
+	get(index, rented, total);
+	return total - rented;
+}
+
+void Storage::setStorageCount(const MovieModel& model, size_t totalCount) {
+	size_t index = getIndexOf(model);
+	auto& record = stock[index];
+	std::get<0>(record) = totalCount;
 }

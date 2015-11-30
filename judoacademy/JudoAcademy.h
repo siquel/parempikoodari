@@ -193,6 +193,15 @@ inline std::ostream& operator<<(std::ostream& os, const MovieModel& model) {
 	return os;
 }
 
+inline bool operator==(const MovieModel& a, const MovieModel& b) {
+	if (&a == &b) return true;
+	return a.getName() == b.getName() &&
+		a.getPrice() == b.getPrice() &&
+		a.getYear() == b.getYear() &&
+		a.getFormat() == b.getFormat() &&
+		a.getDescription() == b.getDescription();
+}
+
 class JudoAcademyView :  public BasicView
 {
 private:
@@ -296,6 +305,25 @@ public:
 	JudoAcademyRentController(View* view, class JudoAcademy* app);
 };
 
+class Storage {
+private:
+	typedef std::vector<MovieModel> MovieCollection;
+	typedef std::vector<std::tuple<size_t, size_t>> Stock;
+	MovieCollection& database;
+	Stock stock;
+	size_t getIndexOf(const MovieModel& model) const;
+	void get(size_t index, size_t& currentlyInStock, size_t& total) const;
+public:
+	Storage(MovieCollection& database);
+
+	size_t currentlyInStock(const MovieModel& movieInStock) const;
+	size_t getTotalCopies(const MovieModel& ofMovie) const;
+	bool isAvailable(const MovieModel& movie) const;
+	void rent(const MovieModel& movie);
+	size_t howManyCurrentlyRented(const MovieModel& movieToCheck) const;
+	void setStorageCount(const MovieModel& model, size_t totalCount);
+};
+
 class JudoAcademy
 {
 private:
@@ -303,7 +331,7 @@ private:
 	std::vector<View*> views;
 	std::vector<Controller*> controllers;
 	MovieCollection database;
-
+	Storage storage;
 	std::queue<std::string> errors;
 
 	bool running;
@@ -313,7 +341,7 @@ private:
 		});	
 	}
 public:
-	JudoAcademy() : running(false) {
+	JudoAcademy() : running(false), storage(database) {
 		View* view = new JudoAcademyView;
 		Controller* controller = new JudoAcademyController(view, this);
 		views.push_back(view);
