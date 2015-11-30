@@ -132,7 +132,10 @@ void JudoAcademyManageController::onModifyPressed() {
 		
 
 		for (size_t i = 0; i < movies.size(); ++i) {
-			std::cout << i << "). --- " << movies[i].getName() << std::endl;
+			MovieModel& model = movies[i];
+			std::cout << i << "). --- " << model.getName()
+				<< " | " << model.getFormatString() << " | Year: " << model.getYear()
+				<< " | Price: " << model.getPrice() << std::endl;
 		}
 
 		std::cin >> index;

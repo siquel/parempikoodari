@@ -61,6 +61,24 @@ public:
 	inline const double getPrice() const {
 		return price;
 	}
+
+	inline std::string getFormatString() const {
+		switch (format)
+		{
+		case DVD:
+			return "DVD";
+			break;
+		case Bluray:
+			return "Bluray";
+			break;
+		case VHS:
+			return "VHS";
+			break;
+		default:
+			return "";
+			break;
+		}
+	}
 };
 
 class Renderable {
