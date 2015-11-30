@@ -135,9 +135,7 @@ void JudoAcademyManageController::onModifyPressed() {
 
 		for (size_t i = 0; i < movies.size(); ++i) {
 			MovieModel& model = movies[i];
-			std::cout << i << "). --- " << model.getName()
-				<< " | " << model.getFormatString() << " | Year: " << model.getYear()
-				<< " | Price: " << model.getPrice() << std::endl;
+			std::cout << i << "). --- " << model << std::endl;
 		}
 
 		std::cin >> index;
@@ -296,7 +294,21 @@ void JudoAcademyRentController::onBackPressed() {
 }
 
 void JudoAcademyRentController::onHirePressed() {
+	system("CLS");
+	size_t i = 0;
+	std::string line;
+	std::vector<MovieModel>& movies = app->getMovies();
 
+	if (movies.empty()) {
+		app->raiseError("No movies to hire!");
+		return;
+	}
+	
+	std::for_each(movies.begin(), movies.end(), [&i](MovieModel& model) {
+		std::cout << i++ << "). " << model << std::endl;
+	});
+	std::cout << "Select movie you want to hire: ";
+	std::getline(std::cin, line);
 }
 
 void JudoAcademyRentController::onReturnPressed() {

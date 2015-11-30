@@ -186,6 +186,13 @@ inline std::ostream& operator<<(std::ostream& os, const SelectableOption& obj) {
 	return os;
 }
 
+inline std::ostream& operator<<(std::ostream& os, const MovieModel& model) {
+	os << model.getName()
+		<< " | " << model.getFormatString() << " | Year: " << model.getYear()
+		<< " | Price: " << model.getPrice();
+	return os;
+}
+
 class JudoAcademyView :  public BasicView
 {
 private:
