@@ -322,6 +322,7 @@ public:
 	void rent(const MovieModel& movie);
 	size_t howManyCurrentlyRented(const MovieModel& movieToCheck) const;
 	void setStorageCount(const MovieModel& model, size_t totalCount);
+	void createStorage(size_t totalCount);
 };
 
 class JudoAcademy
@@ -370,12 +371,17 @@ public:
 		}
 	}
 
+	inline Storage& getStorage() {
+		return storage;
+	}
+
 	inline MovieCollection& getMovies() {
 		return database;
 	}
 
-	inline void addMovie(const MovieModel& movie) {
+	inline void addMovie(const MovieModel& movie, size_t total) {
 		database.push_back(movie);
+		storage.createStorage(total);
 	}
 
 	inline MovieModel* getMovieByName(const std::string& name) {

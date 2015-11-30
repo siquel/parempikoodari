@@ -14,7 +14,6 @@ void JudoAcademyController::onRentButtonSelected() {
 }
 
 void JudoAcademyController::onManagementButtonSelected() {
-	std::cout << "manage button pressed" << std::endl;
 	JudoAcademyManageView* newView = new JudoAcademyManageView();
 	app->pushView(newView);
 	app->pushController(new JudoAcademyManageController(newView, app));
@@ -111,7 +110,12 @@ void JudoAcademyManageController::onAddPressed() {
 		std::cin >> format;
 	} while (format < DVD || format > VHS);
 
-	app->addMovie(MovieModel(name, description, year, price, static_cast<Format>(format)));
+	size_t count = 0;
+	std::cout << "How many copies there are? ";
+	std::cin >> count;
+
+	MovieModel model(name, description, year, price, static_cast<Format>(format));
+	app->addMovie(model, count);
 }
 
 void JudoAcademyManageController::onRemovePressed() {
@@ -312,7 +316,16 @@ void JudoAcademyRentController::onHirePressed() {
 		std::cin >> index;
 	} while (index > movies.size());
 
+	Storage& storage = app->getStorage();
 	MovieModel& model = movies[index];
+	
+	if (!storage.isAvailable(model)) {
+		// TODO fix this
+		app->raiseError("Movie isnt available for hire!");
+		return;
+	}
+
+	storage.rent(model);
 }
 
 void JudoAcademyRentController::onReturnPressed() {
@@ -376,4 +389,8 @@ void Storage::setStorageCount(const MovieModel& model, size_t totalCount) {
 	size_t index = getIndexOf(model);
 	auto& record = stock[index];
 	std::get<0>(record) = totalCount;
+}
+
+void Storage::createStorage(size_t totalCount) {
+	stock.push_back(std::make_tuple(totalCount, totalCount));
 }
