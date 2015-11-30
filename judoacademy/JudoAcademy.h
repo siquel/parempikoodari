@@ -227,6 +227,16 @@ public:
 	void update() override;
 };
 
+class JudoAcademyRentView : public BasicView {
+private:
+public:
+	JudoAcademyRentView();
+	~JudoAcademyRentView();
+	virtual void render(std::ostream& out) const override;
+
+	void update() override;
+};
+
 class Controller {
 protected:
 	class JudoAcademy* app;
@@ -268,6 +278,15 @@ private:
 	void onEditDescriptionPressed();
 public:
 	JudoAcademyMovieEditController(View* view, class JudoAcademy* app, MovieModel* model);
+};
+
+class JudoAcademyRentController : public Controller {
+private:	
+	void onBackPressed();
+	void onHirePressed();
+	void onReturnPressed();
+public:
+	JudoAcademyRentController(View* view, class JudoAcademy* app);
 };
 
 class JudoAcademy

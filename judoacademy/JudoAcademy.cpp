@@ -7,8 +7,10 @@
 	JUDO_CALLBACK_0(selector, target))
 
 void JudoAcademyController::onRentButtonSelected() {
-	std::cout << "rent button pressed" << std::endl;
-
+	JudoAcademyRentView* view = new JudoAcademyRentView();
+	JudoAcademyRentController* controller = new JudoAcademyRentController(view, app);
+	app->pushView(view);
+	app->pushController(controller);
 }
 
 void JudoAcademyController::onManagementButtonSelected() {
@@ -266,4 +268,44 @@ JudoAcademyMovieEditController::JudoAcademyMovieEditController(View* view, JudoA
 	BIND_FUNC_TO_COMPONENT(view, "Edit price", JudoAcademyMovieEditController::onEditPricePressed, this);
 	BIND_FUNC_TO_COMPONENT(view, "Edit description", JudoAcademyMovieEditController::onEditDescriptionPressed, this);
 	BIND_FUNC_TO_COMPONENT(view, "Back", JudoAcademyMovieEditController::onBackPressed, this);
+}
+
+JudoAcademyRentView::JudoAcademyRentView() {
+	addComponent(new SelectableOption('h', "Hire", "Hire movie"));
+	addComponent(new SelectableOption('r', "Return", "Return movie"));
+	addComponent(new SelectableOption('b', "Back", "Go back"));
+}
+
+JudoAcademyRentView::~JudoAcademyRentView() {
+
+}
+
+void JudoAcademyRentView::render(std::ostream& out) const {
+	system("CLS");
+	out << "Welcome to renting service!" << std::endl << std::endl;
+	BasicView::render(out);
+}
+
+void JudoAcademyRentView::update() {
+	BasicView::update();
+}
+
+void JudoAcademyRentController::onBackPressed() {
+	app->popView();
+	app->popController();
+}
+
+void JudoAcademyRentController::onHirePressed() {
+
+}
+
+void JudoAcademyRentController::onReturnPressed() {
+
+}
+
+JudoAcademyRentController::JudoAcademyRentController(View* view, JudoAcademy* app)
+	: Controller(view, app) {
+	BIND_FUNC_TO_COMPONENT(view, "Hire", JudoAcademyRentController::onHirePressed, this);
+	BIND_FUNC_TO_COMPONENT(view, "Return", JudoAcademyRentController::onReturnPressed, this);
+	BIND_FUNC_TO_COMPONENT(view, "Back", JudoAcademyRentController::onBackPressed, this);
 }
