@@ -5,13 +5,15 @@
 namespace crm {
 
 	App::App() 
-		: running(false), view(new ui::MainView(this)), controller(new controller::CRMController(view, this)) {
+		: running(false), 
+		view(new ui::MainView(this)), 
+		controller(new controller::CRMController(view, this)) {
 
 	}
 
 	App::~App() {
 		delete view;
-		
+		delete controller;
 	}
 
 	void App::start() {
